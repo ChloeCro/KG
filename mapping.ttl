@@ -1,0 +1,93 @@
+#Define prefixes
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix ql: <http://semweb.mmlab.be/ns/ql#> .
+@prefix csvw: <http://www.w3.org/ns/csvw#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <http://example.org/rules/> .
+@prefix schema: <https://schema.org/> .
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix mo: <http://purl.org/ontology/mo/> .
+@prefix ex: <http://example.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+#----- First Triples represent the cases ------
+:TriplesMap a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source [
+      a csvw:Table;
+      csvw:url "ECHR_metadata.csv";
+      csvw:dialect [
+        a csvw:Dialect;
+        csvw:delimiter ","
+      ]
+    ];
+    rml:referenceFormulation ql:CSV
+  ].
+
+  # Generate SUBJECTS for triples: iterate through the song title and add class for each
+  :TriplesMap rr:subjectMap [
+  rr:template "http://example.org/legal/{itemid}";
+  rr:class ex:Judgment
+].
+
+# Generate PREDICATE the song title and OBJECTS from title column for triples
+:TriplesMap rr:predicateObjectMap [
+  rr:predicate :judgmentName;
+  rr:objectMap [rr:language "en"; rml:reference "docname"];
+].
+
+# Generate PREDICATE judgment name and OBJECTS from docname column
+:TriplesMap rr:predicateObjectMap [
+    rr:predicate ex:judgmentDate;
+    rr:objectMap [ rml:reference "judgementdate" ; rr:datatype xsd:date ]
+].
+
+# Generate PREDICATE judgment name and OBJECTS from docname column
+:TriplesMap rr:predicateObjectMap [
+    rr:predicate ex:ECLI;
+    rr:objectMap [ rml:reference "ecli" ]
+].
+
+# Generate PREDICATE judgment name and OBJECTS from docname column
+:TriplesMap rr:predicateObjectMap [
+    rr:predicate ex:Conclusion;
+    rr:objectMap [ rml:reference "conclusion" ]
+].
+# Generate PREDICATE judgment name and OBJECTS from docname column
+:TriplesMap rr:predicateObjectMap [
+    rr:predicate ex:applicationNr;
+    rr:objectMap [ rml:reference "appno" ]
+].
+
+# Generate PREDICATE judgment name and OBJECTS from docname column
+:TriplesMap rr:predicateObjectMap [
+    rr:predicate ex:Importance;
+    rr:objectMap [ rml:reference "importance" ]
+].
+
+#----- Second Triples represent the references ------
+:TriplesMap2 a rr:TriplesMap2;
+  rml:logicalSource [
+    rml:source [
+      a csvw:Table;
+      csvw:url "ECHR_edges.csv";
+      csvw:dialect [
+        a csvw:Dialect;
+        csvw:delimiter ","
+      ]
+    ];
+    rml:referenceFormulation ql:CSV
+  ].
+
+  # Generate SUBJECTS for triples: iterate through the song title and add class for each
+  :TriplesMap2 rr:subjectMap [
+  rr:template "http://example.org/legal/{itemid}";
+  rr:class ex:Judgment
+].
+
+# Generate PREDICATE the song title and OBJECTS from title column for triples
+:TriplesMap2 rr:predicateObjectMap [
+  rr:predicate :References;
+  rr:objectMap [ rml:reference "reference2"  ; rr:datatype xsd:string ];
+].

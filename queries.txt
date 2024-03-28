@@ -1,0 +1,50 @@
+####################################################################
+QUERY TO GET COUNT OF VIOLATIONS ARTICLE 3 BY YEAR
+
+PREFIX ex: <http://example.org/legal/>
+
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?year (COUNT(?judgment) as ?count)
+WHERE {
+  ?judgment a ex:judgment ;
+            ex:date ?date ;
+            ex:violation <http://example.org/legal/Article/P1-1> ;
+            ex:article ?article .
+  
+  BIND(year(?date) as ?year)
+}
+GROUP BY ?year
+ORDER BY ?year
+
+#####################################################################
+QUERY TO GET COUNT OF VIOLATIONS ARTICLE 3 BY YEAR AND MONTH
+
+PREFIX ex: <http://example.org/legal/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?year ?month (count(?judgment) as ?count)
+WHERE {
+  ?judgment a ex:judgment ;
+            ex:violation <http://example.org/legal/Article/P1-1> ;
+            ex:date ?date .
+  FILTER(isLiteral(?date) && datatype(?date) = xsd:date)
+  BIND(year(?date) as ?year)
+  BIND(month(?date) as ?month)
+}
+GROUP BY ?year ?month
+ORDER BY ?year ?month
+
+####################################################################
+QUERY TO GET retrieves the number of judgments that have a violation of P1-1 and the number of judgments that are referenced by those judgments
+
+PREFIX ex: <http://example.org/legal/>
+SELECT (COUNT(DISTINCT ?judgment_with_violation) AS ?violations)
+       (COUNT(DISTINCT ?referenced_judgment) AS ?references)
+WHERE {
+  ?judgment_with_violation a ex:judgment ;
+                          ex:violation <http://example.org/legal/Article/6> ;
+                          ex:reference ?referenced_judgment .
+  ?referenced_judgment a ex:judgment .
+}
+
+#####################################################################

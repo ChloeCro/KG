@@ -1,0 +1,83 @@
+#Define prefixes
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix ql: <http://semweb.mmlab.be/ns/ql#> .
+@prefix csvw: <http://www.w3.org/ns/csvw#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <http://example.org/rules/> .
+@prefix schema: <https://schema.org/> .
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix mo: <http://purl.org/ontology/mo/> .
+@prefix ex: <http://example.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno: <https://w3id.org/function/ontology#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+
+#----- First Triples represent the cases ------
+<#LogicalSource>
+    a rml:LogicalSource;
+    rml:source "ECHR_metadata.csv";
+    rml:referenceFormulation ql:CSV.
+
+<#MyTriplesMap> 
+    a rr:TriplesMap;
+    rml:logicalSource <#LogicalSource>;
+    rr:subjectMap [
+        rr:template "http://example.org/legal/{itemid}";
+        rr:class ex:Judgment
+    ];
+    
+    rr:predicateObjectMap [
+        rr:predicate :judgmentName;
+        rr:objectMap [rr:language "en"; rml:reference "docname"];
+    ];
+    
+    rr:predicateObjectMap [
+        rr:predicate ex:judgmentDate;
+        rr:objectMap [ rml:reference "judgementdate" ]
+    ];
+    
+    rr:predicateObjectMap [
+        rr:predicate ex:ECLI;
+        rr:objectMap [ rml:reference "ecli" ]
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate ex:Conclusion;
+        rr:objectMap [ rml:reference "conclusion" ]
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate ex:applicationNr;
+        rr:objectMap <#FunctionMap>;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate ex:Importance;
+        rr:objectMap [ rml:reference "importance" ]
+    ].
+
+<#FunctionMap>
+    fnml:functionValue [
+        rml:logicalSource <#LogicalSource>;
+        rr:predicateObjectMap [
+            rr:predicate fno:executes; 
+            rr:objectMap [ 
+                rr:constant grel:string_split 
+            ];
+        ];
+        rr:predicateObjectMap [
+            rr:predicate grel:valueParameter;
+            rr:objectMap [ 
+                rml:reference "appno" 
+            ];
+        ];
+        rr:predicateObjectMap [
+            rr:predicate grel:p_string_sep;
+            rr:objectMap [ 
+                rr:constant " ";
+            ];
+        ];
+    ].
+
